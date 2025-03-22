@@ -1,0 +1,32 @@
+name: CheckoutTests
+on: [push, pull_request]
+
+jobs:
+  init-environment:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Add application repository
+        uses: actions/checkout@v4
+      - name: Add jdk 21 Oracle
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'oracle'
+          java-version: '21'
+          cache: "gradle"
+      - name: Build project
+        run: ./gradlew build
+
+  execute-tests:
+    needs: init-environment
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Add application repository
+        uses: actions/checkout@v4
+      - name: Add jdk 21 Oracle
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'oracle'
+          java-version: '21'
+          cache: "gradle"
+      - name: Start tests
+        run: ./gradlew test
