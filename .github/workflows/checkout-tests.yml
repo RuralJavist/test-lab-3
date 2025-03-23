@@ -54,5 +54,4 @@ jobs:
           min-coverage-overall: 40
           min-coverage-changed-files: 50
           update-comment: 'true'
-          debug-mode: 'true'
           title: "Coverage result"

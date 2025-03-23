@@ -343,7 +343,7 @@ class UserAnalyticsIntegrationTest {
 
 
     @Order(4)
-    @DisplayName("Тест получения неактивных пользователей, логаут которых больше установленного" +
+    @DisplayName("Тест получения пользователей, логаут которых больше установленного" +
             "кол-ва дней")
     @ParameterizedTest
     @MethodSource(value = ["getInactiveUserArguments"])
