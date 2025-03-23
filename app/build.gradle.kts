@@ -11,6 +11,7 @@ plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
     alias(libs.plugins.kotlin.jvm)
     id("jacoco")
+    id("io.qameta.allure") version "2.12.0"
     // Apply the application plugin to add support for building a CLI application in Java.
     application
 }

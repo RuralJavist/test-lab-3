@@ -50,8 +50,46 @@ jobs:
         with:
           paths: |
               ${{ github.workspace }}/app/build/reports/jacoco/test/xml/test.xml
-          token: ${{ secrets.JACOCO_REPORT }}
+          token: ${{ secrets.TEST_TOKEN }}
           min-coverage-overall: 40
           min-coverage-changed-files: 50
           update-comment: 'true'
           title: "Coverage result"
+
+  allure-report:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Add application repository
+        uses: actions/checkout@v4
+      - name: Add jdk 21 Oracle
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'oracle'
+          java-version: '21'
+
+      - name: Start tests
+        run: ./gradlew test
+
+      - name: Load test report history
+        uses: actions/checkout@v3
+        if: always()
+        continue-on-error: false
+        with:
+          ref: gh-pages
+          path: gh-pages
+
+      - name: Build test report
+        uses: simple-elf/allure-report-action@v1.7
+        if: always()
+        with:
+          gh_pages: gh-pages
+          allure_history: allure-history
+          allure_results: ${{ github.workspace }}/app/build/allure-results
+
+      - name: Publish test report
+        uses: peaceiris/actions-gh-pages@v3
+        if: always()
+        with:
+          github_token: ${{ secrets.TEST_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: allure-history
