@@ -1,19 +1,18 @@
 package service;
 
-import org.example.exceptions.ElementNotFoundException;
-import org.jetbrains.annotations.NotNull;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import org.example.exceptions.ElementNotFoundException;
+import org.jetbrains.annotations.NotNull;
 
 public class UserAnalyticsService {
 
     private final Map<String, User> users = new HashMap<>();
     private final Map<String, List<Session>> userSessions = new HashMap<>();
-
 
     public boolean registerUser(String userId, String userName) {
         if (users.containsKey(userId)) {
@@ -38,7 +37,8 @@ public class UserAnalyticsService {
         if (!userSessions.containsKey(userId)) {
             throw new ElementNotFoundException("Sessions not found for user");
         }
-        List<Session> sortedSessionsList = userSessions.get(userId).stream().sorted().toList();
+        List<Session> sortedSessionsList =
+                userSessions.get(userId).stream().sorted().toList();
         return getActivityTime(sortedSessionsList);
     }
 
@@ -62,7 +62,8 @@ public class UserAnalyticsService {
                 maxLogoutTime = maxLogoutTime.isAfter(sessionLogoutTime) ? maxLogoutTime : sessionLogoutTime;
             }
             if (sessionLoginTime.isAfter(maxLogoutTime)) {
-                totalActivityTime += Duration.between(minLoginTime, maxLogoutTime).toMinutes();
+                totalActivityTime +=
+                        Duration.between(minLoginTime, maxLogoutTime).toMinutes();
                 minLoginTime = sessionLoginTime;
                 maxLogoutTime = sessionLogoutTime;
             }
@@ -78,8 +79,10 @@ public class UserAnalyticsService {
             List<Session> sessions = entry.getValue();
             if (sessions.isEmpty()) continue;
 
-            LocalDateTime lastSessionTime = sessions.stream().max(Comparator.comparing(Session::getLogoutTime))
-                    .get().logoutTime; //правильнее взять макс значение по логауту
+            LocalDateTime lastSessionTime = sessions.stream()
+                    .max(Comparator.comparing(Session::getLogoutTime))
+                    .get()
+                    .logoutTime; // правильнее взять макс значение по логауту
 
             long daysInactive = ChronoUnit.DAYS.between(lastSessionTime, LocalDateTime.now());
             if (daysInactive > days) {
@@ -109,21 +112,23 @@ public class UserAnalyticsService {
                     String dayKey = session.getLoginTime().toLocalDate().toString();
 
                     long minutes;
-                    LocalDateTime startMonthTime = LocalDate.of(month.getYear(), month.getMonth(), 1).atStartOfDay();
+                    LocalDateTime startMonthTime =
+                            LocalDate.of(month.getYear(), month.getMonth(), 1).atStartOfDay();
                     LocalDateTime endMonthTime = startMonthTime.plusMonths(1);
 
                     LocalDateTime sessionLogoutTime = session.getLogoutTime();
                     LocalDateTime sessionLoginTime = session.getLoginTime();
 
-                    LocalDateTime effectiveStart = sessionLoginTime.isBefore(startMonthTime) ? startMonthTime : sessionLoginTime;
-                    LocalDateTime effectiveEnd = sessionLogoutTime.isAfter(endMonthTime) ? endMonthTime : sessionLogoutTime;
+                    LocalDateTime effectiveStart =
+                            sessionLoginTime.isBefore(startMonthTime) ? startMonthTime : sessionLoginTime;
+                    LocalDateTime effectiveEnd =
+                            sessionLogoutTime.isAfter(endMonthTime) ? endMonthTime : sessionLogoutTime;
 
                     minutes = Duration.between(effectiveStart, effectiveEnd).toMinutes();
                     activityByDay.put(dayKey, activityByDay.getOrDefault(dayKey, 0L) + minutes);
                 });
         return activityByDay;
     }
-
 
     /**
      * Проверяет, находится ли сессия в пределах заданного месяца.

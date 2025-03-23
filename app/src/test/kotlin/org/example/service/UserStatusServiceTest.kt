@@ -1,8 +1,9 @@
 package org.example.service
 import org.example.exceptions.ElementNotFoundException
-import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.junit.jupiter.params.provider.ValueSource
@@ -19,7 +20,6 @@ import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UserStatusServiceTest {
-
     @BeforeAll
     fun init() {
         MockitoAnnotations.openMocks(this)
@@ -32,12 +32,19 @@ class UserStatusServiceTest {
     private lateinit var userStatusService: UserStatusService
 
     @ParameterizedTest(name = "Тестирование метода getUserStatus")
-    @CsvSource(value = ["123:Inactive",
-        "456:Active",
-        "789:Highly active",
-        "987:Inactive"], delimiter = ':')
-    fun testGetUserStatus(userId: String, result: String) {
-
+    @CsvSource(
+        value = [
+            "123:Inactive",
+            "456:Active",
+            "789:Highly active",
+            "987:Inactive",
+        ],
+        delimiter = ':',
+    )
+    fun testGetUserStatus(
+        userId: String,
+        result: String,
+    ) {
         Mockito.`when`(userAnalyticsService.getTotalActivityTime("123")).thenReturn(59L)
         Mockito.`when`(userAnalyticsService.getTotalActivityTime("456")).thenReturn(60L)
         Mockito.`when`(userAnalyticsService.getTotalActivityTime("789")).thenReturn(120L)
@@ -57,11 +64,12 @@ class UserStatusServiceTest {
         val dateTimeLogin2 = localDate.minusDays(1)
         val dateTimeLogin3 = localDate.minusHours(10)
 
-        val correctSessions: MutableList<UserAnalyticsService.Session> = mutableListOf(
-            UserAnalyticsService.Session(dateTimeLogin2, dateTimeLogin2.plusHours(17)),
-            UserAnalyticsService.Session(dateTimeLogin1, dateTimeLogin1.plusDays(1)),
-            UserAnalyticsService.Session(dateTimeLogin3, dateTimeLogin3.plusHours(5))
-        )
+        val correctSessions: MutableList<UserAnalyticsService.Session> =
+            mutableListOf(
+                UserAnalyticsService.Session(dateTimeLogin2, dateTimeLogin2.plusHours(17)),
+                UserAnalyticsService.Session(dateTimeLogin1, dateTimeLogin1.plusDays(1)),
+                UserAnalyticsService.Session(dateTimeLogin3, dateTimeLogin3.plusHours(5)),
+            )
 
         val maxLogoutForDateTimes = correctSessions.stream().max(Comparator.comparing(UserAnalyticsService.Session::getLogoutTime)).get()
         val maxLogoutForDateTimeFormated = maxLogoutForDateTimes.logoutTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
@@ -74,11 +82,14 @@ class UserStatusServiceTest {
 
         when (userId) {
             "123" -> assertThrows(ElementNotFoundException::class.java) { getMaxLogoutSession() }
-            "789" -> assertTrue(getMaxLogoutSession().isEmpty , "Extend empty optional")
+            "789" -> assertTrue(getMaxLogoutSession().isEmpty, "Extend empty optional")
             else -> {
                 val maxLogoutTime = getMaxLogoutSession().get()
-                assertEquals(maxLogoutTime, maxLogoutForDateTimeFormated,
-                    "Incorrect result, expect - $maxLogoutForDateTimeFormated, given - $maxLogoutTime")
+                assertEquals(
+                    maxLogoutTime,
+                    maxLogoutForDateTimeFormated,
+                    "Incorrect result, expect - $maxLogoutForDateTimeFormated, given - $maxLogoutTime",
+                )
             }
         }
         Mockito.verify(userAnalyticsService).getUserSessions(userId)

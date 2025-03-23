@@ -1,6 +1,5 @@
 package service;
 
-
 import java.util.Comparator;
 import java.util.Optional;
 
@@ -31,8 +30,8 @@ public class UserStatusService {
      * @return - дата логаута
      */
     public Optional<String> getUserLastSessionDate(String userId) {
-        return userAnalyticsService.getUserSessions(userId)
-                .stream().max(Comparator.comparing(UserAnalyticsService.Session::getLogoutTime))
+        return userAnalyticsService.getUserSessions(userId).stream()
+                .max(Comparator.comparing(UserAnalyticsService.Session::getLogoutTime))
                 .map(el -> el.getLogoutTime().toLocalDate().toString());
     }
 }
