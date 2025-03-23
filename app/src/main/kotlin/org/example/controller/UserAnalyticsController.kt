@@ -1,12 +1,11 @@
 package org.example.controller
 
-
 import io.javalin.Javalin
+import io.javalin.http.Context
+import org.example.exceptions.ElementNotFoundException
 import service.UserAnalyticsService
 import java.time.LocalDateTime
 import java.time.YearMonth
-import io.javalin.http.Context
-import org.example.exceptions.ElementNotFoundException
 
 object UserAnalyticsController {
     @JvmStatic
@@ -26,7 +25,7 @@ object UserAnalyticsController {
                 ctx.result("User registered: $success")
             } catch (argumentException: IllegalArgumentException) {
                 ctx.status(409)
-                    .result("User already exist") //добавил обработчик
+                    .result("User already exist") // добавил обработчик
             }
         }
 
@@ -44,7 +43,7 @@ object UserAnalyticsController {
                 service.recordSession(userId, login, logout)
                 ctx.result("Session recorded")
             } catch (e: ElementNotFoundException) {
-                ctx.status(404).result(e.message) //добавил обработку ошибки not found
+                ctx.status(404).result(e.message) // добавил обработку ошибки not found
             } catch (e: Exception) {
                 ctx.status(400).result("Invalid data: " + e.message)
             }
@@ -72,7 +71,7 @@ object UserAnalyticsController {
             }
             try {
                 val days = daysParam.toInt()
-                if (days < 0) { //проверка но отриц. кол-во дней
+                if (days < 0) { // проверка но отриц. кол-во дней
                     ctx.status(400).result("Days param can't be negative")
                     return@get
                 }
@@ -104,4 +103,3 @@ object UserAnalyticsController {
         return app
     }
 }
-
